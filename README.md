@@ -1,4 +1,4 @@
-# Snippets-WebDev
+# Sample PHP/JSON/WHATEVERWEBFILE
 Some pieces of codes or config sample for various library.
 
 ***
