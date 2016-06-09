@@ -7,4 +7,7 @@ If u like to have clean and nice CSS, the sample file for **[CSSComb](https://gi
 
 With more than 15 property category, the result file can be big after parsing, but for dev it's cool because you can read all the style very quickly. And minifying the file with library like csso before moving to prod and it's perfect :)
 
+After parsing :
+![Parsing screenshot](http://s33.postimg.org/9vvdl56fj/screenshot_csscombed.png)
+
 ***
