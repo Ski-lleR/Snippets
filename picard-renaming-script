@@ -1,0 +1,282 @@
+$noop(★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★)
+$noop(★ MBP Magic-Script - v0.1                                              ★)
+$noop(★                                                                      ★)
+$noop(★ Here is a script for music renaming in MusicBrainz Picard            ★)
+$noop(★                                                                      ★)
+$noop(★ Features :                                                           ★)
+$noop(★ - Organize root music folder with last.fm category OR artist initial ★)
+$noop(★ - Can use custom subfolder for each main type [Album/Single/EP...]   ★)
+$noop(★ - Can use custom subfolder for compilation [!various]                ★)
+$noop(★ - Exclude type album from using subfolder                            ★)
+$noop(★ - Custom folder for soundtrack/various                               ★)
+$noop(★ - Alphabetize artist without leading "The"                           ★)
+$noop(★ - Improve tag displaying on some device                              ★)
+$noop(★ - Filtered character for files & folders naming                      ★)
+$noop(★ - Include media type in folder name [when it's not CD]               ★)
+$noop(★ - Subfolder for multi-disc [setting to disable subfolder]            ★)
+$noop(★ - Custom settings                                                    ★)
+$noop(★                                                                      ★)
+$noop(★ Needed :                                                             ★)
+$noop(★ - Last.fm.ng plugin [for category trending]                          ★)
+$noop(★   -> https://github.com/fdemmer/Picard-Last.fm.ng-Plugin             ★)
+$noop(★                                                                      ★)
+$noop(★ Happy tagging!!!                                                     ★)
+$noop(★                                                                      ★)
+$noop(★----------------------------------------------------------------------★)
+$noop(★                           ★ By Ski-lleR ★                            ★)
+$noop(★----------------------------------------------------------------------★)
+$noop(★                                                                      ★)
+$noop(★ Thanks to                                                            ★)
+$noop(★                                                                      ★)
+$noop(★ avibrazil for his filter                                             ★)
+$noop(★ > https://github.com/avibrazil/picard-scripting                      ★)
+$noop(★                                                                      ★)
+$noop(★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★)
+
+$noop(######################### SETTINGS #########################)
+
+$noop(★ GLOBAL ★)
+$set(_separateByTypeInArtistFolder,1)
+$set(_separateAlbum,0)
+
+$noop(★ Multi-Disc ★)
+$set(_useSubDiscFolder,1)
+$set(_showDiscSubtitle,1)
+
+$noop(★ orderType ★)
+$noop(★  1: Category [Last.fm.ng] ★)
+$noop(★  2: Artist first letter ★)
+$set(_orderType,1)
+
+$noop(★ CUSTOM SUBFOLDER BY TYPE ★)
+$set(_albumSubFolder,Albums/)
+$set(_singlesSubFolder,Singles/)
+$set(_epSubFolder,EP/)
+$set(_broadcastSubFolder,Broadcast/)
+$set(_otherSubFolder,Others/)
+
+$noop(★ COMPILATION FOLDER [NO VARIOUS] ★)
+$set(_compilationsSubFolder,Compilations/)
+
+$noop(★ SOUNDTRACK/VARIOUS FOLDER ★)
+$set(_soundTracksFolder,SoundTracks/)
+$set(_variousArtistsFolder,Various/)
+
+$noop(####################### END SETTINGS #######################)
+
+
+$noop(########## PATH SAMPLE [with defaults settings] ############)
+
+$noop(★ 1st level ★)
+$noop(~/Music/SoundTracks)
+$noop(~/Music/Various)
+$noop(~/Music/Category)
+
+$noop(★ 2nd level ★)
+$noop(~/Music/SoundTracks/Album name - 2016 [Vinyl])
+$noop(~/Music/Various/Album name - 2016 [Vinyl])
+$noop(~/Music/Category/Artist, The)
+
+$noop(★ 3rd level ★)
+$noop(~/Music/SoundTracks/Album name - 2016 [Vinyl]/CD1~subtitle)
+$noop(~/Music/Various/Album name - 2016 [Vinyl]/CD1~subtitle)
+$noop(~/Music/Category/Artist, The/Compilations)
+$noop(~/Music/Category/Artist, The/Singles)
+$noop(~/Music/Category/Artist, The/EP)
+$noop(~/Music/Category/Artist, The/Album name - 2016 [Vinyl])
+
+$noop(★ 4th level ★)
+$noop(~/Music/SoundTracks/Album name - 2016 [Vinyl]/CD1~subtitle/01. Track.flac)
+$noop(~/Music/Various/Album name - 2016 [Vinyl]/CD1~subtitle/01. Track.flac)
+$noop(~/Music/Category/Artist, The/Compilations/Album name - 2016 [Vinyl])
+$noop(~/Music/Category/Artist, The/Singles/Album name - 2016 [Vinyl])
+$noop(~/Music/Category/Artist, The/EP/Album name - 2016 [Vinyl])
+$noop(~/Music/Category/Artist, The/Album name - 2016 [Vinyl]/CD1~subtitle)
+
+$noop(★ 5eme level ★)
+$noop(~/Music/Category/Artist, The/Compilations/Album name - 2016 [Vinyl]/CD1~subtitle)
+$noop(~/Music/Category/Artist, The/Singles/Album name - 2016 [Vinyl]/CD1~subtitle)
+$noop(~/Music/Category/Artist, The/EP/Album name - 2016 [Vinyl]/CD1~subtitle)
+$noop(~/Music/Category/Artist, The/Album name - 2016 [Vinyl]/CD1~subtitle/01. Track.flac)
+
+$noop(★ 6eme level ★)
+$noop(~/Music/Category/Artist, The/Compilations/Album name - 2016 [Vinyl]/CD1~subtitle/01. Track.flac)
+$noop(~/Music/Category/Artist, The/Singles/Album name - 2016 [Vinyl]/CD1~subtitle/01. Track.flac)
+$noop(~/Music/Category/Artist, The/EP/Album name - 2016 [Vinyl]/CD1~subtitle/01. Track.flac)
+
+
+$noop(########## DETECT MUSIC TYPE ###############################)
+
+$noop(★ Detect Album ★)
+$if($in(%releasetype%,album),
+  $set(_isAlbum,1)
+)
+
+$noop(★ Detect Single ★)
+$if($in(%releasetype%,single),
+  $set(_isSingle,1)
+)
+
+$noop(★ Detect EP ★)
+$if($in(%releasetype%,ep),
+  $set(_isEP,1)
+)
+
+$noop(★ Detect Broadcast ★)
+$if($in(%releasetype%,broadcast),
+  $set(_isBroadcast,1)
+)
+
+$noop(★ Detect Other ★)
+$if($in(%releasetype%,other),
+  $set(_isOther,1)
+)
+
+$noop(★ Detect Artist Compilation ★)
+$if($in(%releasetype%,compilation),
+  $set(_isArtistCompil,1)
+)
+
+$noop(★ Detect Soundtrack ★)
+$if($in(%releasetype%,soundtrack),
+  $set(_isSoundTrack,1)
+)
+
+$noop(★ Detect Various Artist ★)
+$if($eq(%albumartist%,Various Artists),
+  $set(_isVarious,1)
+)
+
+$noop(★ Re-detect Compilation ★)
+$if($eq(%compilation%,1),
+  $set(_isGlobalCompil,1)
+)
+
+
+$noop(########## TAG MANAGE ######################################)
+
+$noop(★ Organize artist by alphabetical folders excluding leading The ★)
+$set(albumartist,$if($eq($left(%albumartist%,4),The ),%albumartistsort%,%albumartist%))
+
+
+$noop(########## TAG CLEANUP  ####################################)
+
+$noop(★ Typography for tags: changes will affect tags on media ★)
+
+$noop(★ ... ➡ …)
+$set(album,$replace(%album%,...,…))
+$set(title,$replace(%title%,...,…))
+$set(discsubtitle,$replace(%discsubtitle%,...,…))
+
+$noop(★ No. ➡ №)
+$set(album,$replace(%album%, [Nn]o.\\s*\(\\d\), №\\1))
+$set(title,$rreplace(%title%, [Nn]o.\\s*\(\\d\), №\\1))
+$set(discsubtitle,$replace(%discsubtitle%, [Nn]o.\\s*\(\\d\), №\\1))
+
+$noop(★ [digit]" ➡ [digit]″)
+$set(album,$rreplace(%album%,\(\\d\)",\\1″))
+$set(discsubtitle,$rreplace(%discsubtitle%,\(\\d\)",\\1″))
+
+$noop(★ "something" ➡ “something”)
+$set(albumartist,$rreplace(%albumartist%,"\(.*?\)",“\\1”))
+$set(artist,$rreplace(%artist%,"\(.*?\)",“\\1”))
+$set(album,$rreplace(%album%,"\(.*?\)",“\\1”))
+$set(title,$rreplace(%title%,"\(.*?\)",“\\1”))
+$set(discsubtitle,$rreplace(%discsubtitle%,"\(.*?\)",“\\1”))
+
+
+$noop(★ Typography on file naming only ★)
+
+$set(_titleForFilename,%title%)
+$set(_albumForFilename,%album%)
+$set(_discsubtitleForFilename,%discsubtitle%)
+$set(_albumartistForFilename,%albumartist%)
+$set(_artistForFilename,%artist%)
+
+$noop(★ # ➡ ♯)
+$set(_titleForFilename,$replace(%_titleForFilename%,#,♯))
+$set(_albumForFilename,$replace(%_albumForFilename%,#,♯))
+$set(_discsubtitleForFilename,$replace(%_discsubtitleForFilename%,#,♯))
+
+$noop(★ : ➡ ∶)
+$set(_titleForFilename,$replace(%_titleForFilename%,:,∶))
+$set(_albumForFilename,$replace(%_albumForFilename%,:,∶))
+$set(_discsubtitleForFilename,$replace(%_discsubtitleForFilename%,:,∶))
+$set(_artistForFilename,$replace(%_artistForFilename%,:,∶))
+$set(_albumartistForFilename,$replace(%_albumartistForFilename%,:,∶))
+
+$noop(★ ? ➡ ⁇)
+$set(_titleForFilename,$replace(%_titleForFilename%,?,⁇))
+$set(_albumForFilename,$replace(%_albumForFilename%,?,⁇))
+$set(_discsubtitleForFilename,$replace(%_discsubtitleForFilename%,?,⁇))
+$set(_artistForFilename,$replace(%_artistForFilename%,?,⁇))
+
+$set(_titleForFilename,$replace(%_titleForFilename%,|,￨))
+$set(_albumForFilename,$replace(%_albumForFilename%,|,￨))
+$set(_discsubtitleForFilename,$replace(%_discsubtitleForFilename%,|,￨))
+
+$set(_titleForFilename,$replace(%_titleForFilename%,>,＞))
+$set(_albumForFilename,$replace(%_albumForFilename%,>,＞))
+$set(_discsubtitleForFilename,$replace(%_discsubtitleForFilename%,>,＞))
+
+$set(_titleForFilename,$replace(%_titleForFilename%,<,＜))
+$set(_albumForFilename,$replace(%_albumForFilename%,<,＜))
+$set(_discsubtitleForFilename,$replace(%_discsubtitleForFilename%,<,＜))
+
+$set(_titleForFilename,$replace(%_titleForFilename%,*,✱))
+$set(_albumForFilename,$replace(%_albumForFilename%,*,✱))
+$set(_discsubtitleForFilename,$replace(%_discsubtitleForFilename%,*,✱))
+$set(_artistForFilename,$replace(%_artistForFilename%,*,✱))
+$set(_albumartistForFilename,$replace(%_albumartistForFilename%,*,✱))
+
+$set(_titleForFilename,$replace(%_titleForFilename%,&,＆))
+$set(_albumForFilename,$replace(%_albumForFilename%,&,＆))
+$set(_discsubtitleForFilename,$replace(%_discsubtitleForFilename%,&,＆))
+$set(_artistForFilename,$replace(%_artistForFilename%,&,＆))
+$set(_albumartistForFilename,$replace(%_albumartistForFilename%,&,＆))
+
+
+$noop(########## RENAMER CORE ####################################)
+
+$noop(★ Soundtrack in custom directory ★)
+$if(%_isSoundTrack%,%_soundTracksFolder%,
+
+  $noop(★ Various in custom directory ★)
+  $if(%_isVarious%,%_variousArtistsFolder%,
+
+    $noop(★ Order root by category ★)
+    $if($eq(%_orderType%,1),$if2(%albumgrouping%,Unknown))/
+
+    $noop(★ Order root by artist first letter ★)
+    $if($eq(%_orderType%,2),
+      $upper($firstalphachar($if2(%_albumartistForFilename%, %_artistForFilename%),#))/
+    )
+
+    $noop(★ Artist ★)
+    $if2(%_albumartistForFilename%,%_artistForFilename%)/
+
+    $noop(★ Organize by type ★)
+    $if($eq(%_separateByTypeInArtistFolder%,1),
+      $if($or(%_isArtistCompil%,%_isGlobalCompil%),%_compilationsSubFolder%,
+        $if($and(%_isAlbum%,$eq(%_separateAlbum%,1)),%_albumSubFolder%)
+        $if(%_isSingle%,%_singlesSubFolder%)
+        $if(%_isEP%,%_epSubFolder%)
+        $if(%_isBroadcast%,%_broadcastSubFolder%)
+        $if(%_isOther%,%_otherSubFolder%)
+      )
+    )
+  )
+)
+
+$noop(★ Album - YEAR [Media-Type][CDx~subtitle]/ or /CDx~subtitle/ ★)
+%_albumForFilename% - 
+$if($if2(%originalyear%,%originaldate%,%date%),$left($if2(%originalyear%,%originaldate%,%date%),4),0000)
+$if($ne(%media%,CD), [%media%])
+$if($gt(%totaldiscs%,1),$if($and(%_discsubtitleForFilename%,$eq(%_showDiscSubtitle%,1)),
+  $if($eq(%_useSubDiscFolder%,1),/,[)CD%discnumber%~%_discsubtitleForFilename%$if($eq(%_useSubDiscFolder%,1),/,]/),
+  $if($eq(%_useSubDiscFolder%,1),/,[)CD%discnumber%$if($eq(%_useSubDiscFolder%,1),/,]/)
+))
+/
+
+$noop(★ Track. Title ★)
+$if(%tracknumber%,$num(%tracknumber%,2). )%_titleForFilename%
