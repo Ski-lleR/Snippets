@@ -1,4 +1,4 @@
-# Sample PHP/JSON/WHATEVERWEBFILE
+# Sample PHP/JSON/WHATEVERFILE
 Some pieces of codes or config sample for various library.
 
 ***
