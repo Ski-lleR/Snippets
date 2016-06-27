@@ -18,7 +18,7 @@ You have the possibility to arrange root folder with last.fm category OR alphabe
 
 There is multiple settings to help you to have your file arranged like you want.
 
-After renaming :
+After renaming :  
 ![Renaming screenshot](https://s32.postimg.org/oo0n21jed/Capture_d_cran_de_2016_06_27_02_26_01.png)
 
 ***
