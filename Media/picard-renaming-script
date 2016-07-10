@@ -1,5 +1,5 @@
 $noop(★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★)
-$noop(★ MBP Magic-Script - v0.3.1                                            ★)
+$noop(★ MBP Magic-Script - v0.3.2                                            ★)
 $noop(★                                                                      ★)
 $noop(★ Here is a script for music renaming in MusicBrainz Picard            ★)
 $noop(★                                                                      ★)
@@ -273,7 +273,7 @@ $if(%_isSoundTrack%,%_soundTracksFolder%,
       $if($or(%_isArtistCompil%,%_isGlobalCompil%),%_compilationsSubFolder%,
         $if($eq(%_isLive%,1),%_liveSubFolder%,
           $if($eq(%_isSingle%,1),%_singlesSubFolder%,
-            $if($eq(%_isSingle%,1),%_epSubFolder%,
+            $if($eq(%_isEP%,1),%_epSubFolder%,
               $if($eq(%_isBroadcast%,1),%_broadcastSubFolder%,
                 $if($eq(%_isOther%,1),%_otherSubFolder%,
                   $if($eq(%_isAlbum%,1),
