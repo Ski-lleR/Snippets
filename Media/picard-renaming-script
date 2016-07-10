@@ -1,5 +1,5 @@
 $noop(★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★)
-$noop(★ MBP Magic-Script - v0.1                                              ★)
+$noop(★ MBP Magic-Script - v0.2                                              ★)
 $noop(★                                                                      ★)
 $noop(★ Here is a script for music renaming in MusicBrainz Picard            ★)
 $noop(★                                                                      ★)
@@ -14,6 +14,9 @@ $noop(★ - Improve tag displaying on some device                              �
 $noop(★ - Filtered character for files & folders naming                      ★)
 $noop(★ - Include media type in folder name [when it's not CD]               ★)
 $noop(★ - Subfolder for multi-disc [setting to disable subfolder]            ★)
+$noop(★ - Custom folder tag for multi-disc CD/Vinyl [CD1/Disc1 by default]   ★)
+$noop(★ - Put multi-CD release in same folder [naming become 101/102/201...] ★)
+$noop(★ - Vinyl can use musicbrainz style for track [A1/A2/B1...]            ★)
 $noop(★ - Custom settings                                                    ★)
 $noop(★                                                                      ★)
 $noop(★ Needed :                                                             ★)
@@ -38,10 +41,14 @@ $noop(######################### SETTINGS #########################)
 $noop(★ GLOBAL ★)
 $set(_separateByTypeInArtistFolder,1)
 $set(_separateAlbum,0)
+$set(_useMusicBrainzStyleForVinylTrack,1)
 
 $noop(★ Multi-Disc ★)
 $set(_useSubDiscFolder,1)
+$set(_mergeDiscWhenNotUsingSubfolder,0)
 $set(_showDiscSubtitle,1)
+$set(_nameForTypeCD,CD)
+$set(_nameForTypeVinyl,Disc)
 
 $noop(★ orderType ★)
 $noop(★  1: Category [Last.fm.ng] ★)
@@ -270,13 +277,32 @@ $if(%_isSoundTrack%,%_soundTracksFolder%,
 
 $noop(★ Album - YEAR [Media-Type][CDx~subtitle]/ or /CDx~subtitle/ ★)
 %_albumForFilename% - 
+
 $if($if2(%originalyear%,%originaldate%,%date%),$left($if2(%originalyear%,%originaldate%,%date%),4),0000)
 $if($ne(%media%,CD), [%media%])
-$if($gt(%totaldiscs%,1),$if($and(%_discsubtitleForFilename%,$eq(%_showDiscSubtitle%,1)),
-  $if($eq(%_useSubDiscFolder%,1),/,[)CD%discnumber%~%_discsubtitleForFilename%$if($eq(%_useSubDiscFolder%,1),/,]/),
-  $if($eq(%_useSubDiscFolder%,1),/,[)CD%discnumber%$if($eq(%_useSubDiscFolder%,1),/,]/)
-))
-/
+
+$if($gt(%totaldiscs%,1),$noop(
+  )$if($in(%media%,Vinyl),$noop(
+    )$set(_nameForDiscFolder,@OSLASH@@OBRACKET@%_nameForTypeVinyl%%discnumber%@CBRACKET@),$noop(
+    )$set(_nameForDiscFolder,@OSLASH@@OBRACKET@%_nameForTypeCD%%discnumber%@CBRACKET@))$noop(
+    )$if($and(%_discsubtitleForFilename%,$eq(%_showDiscSubtitle%,1)),~%_discsubtitleForFilename%)$noop(
+    )$if($eq(%_useSubDiscFolder%,1),$noop(
+      )$set(_nameForDiscFolder,$replace(%_nameForDiscFolder%,@OSLASH@@OBRACKET@,/))$noop(
+      )$set(_nameForDiscFolder,$replace(%_nameForDiscFolder%,@CBRACKET@,)),$noop(
+      )$if($eq(%_mergeDiscWhenNotUsingSubfolder%,1),$noop(
+        )$unset(_nameForDiscFolder),$noop(
+        )$set(_nameForDiscFolder,$replace(%_nameForDiscFolder%,@OSLASH@@OBRACKET@,[))$noop(
+        )$set(_nameForDiscFolder,$replace(%_nameForDiscFolder%,@CBRACKET@,]))$noop(
+      ))$noop(
+    ))$noop(
+    )$if(%_nameForDiscFolder%, %_nameForDiscFolder%)
+)/
 
 $noop(★ Track. Title ★)
-$if(%tracknumber%,$num(%tracknumber%,2). )%_titleForFilename%
+$if($in(%media%,Vinyl),$noop(
+  )$if($eq(%_useMusicBrainzStyleForVinylTrack%,1),$noop(
+    )$if(%_musicbrainz_tracknumber%,%_musicbrainz_tracknumber%. )$noop(
+  )),$noop(
+  )$if(%tracknumber%,$if($gt(%totaldiscs%,1),$if($and($eq(%_useSubDiscFolder%,0),$eq(%_mergeDiscWhenNotUsingSubfolder%,1)),%discnumber%))$num(%tracknumber%,2). )
+)
+%_titleForFilename%
