@@ -1,5 +1,5 @@
 $noop(★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★)
-$noop(★ MBP Magic-Script - v0.3.4                                            ★)
+$noop(★ MBP Magic-Script - v0.3.5                                            ★)
 $noop(★                                                                      ★)
 $noop(★ Here is a script for music renaming in MusicBrainz Picard            ★)
 $noop(★                                                                      ★)
@@ -292,9 +292,10 @@ $if($if2(%originalyear%,%originaldate%,%date%),$left($if2(%originalyear%,%origin
 $if($ne(%media%,CD), [%media%])
 
 $if($gt(%totaldiscs%,1),$noop(
+  )$if($lt(%totaldiscs%,10),$set(_discnumber,%discnumber%),$set(_discnumber,$num(%discnumber%,2)))$noop(
   )$if($in(%media%,Vinyl),$noop(
-    )$set(_nameForDiscFolder,@OSLASH@@OBRACKET@%_nameForTypeVinyl%%discnumber%@CBRACKET@),$noop(
-    )$set(_nameForDiscFolder,@OSLASH@@OBRACKET@%_nameForTypeCD%%discnumber%@CBRACKET@))$noop(
+    )$set(_nameForDiscFolder,@OSLASH@@OBRACKET@%_nameForTypeVinyl%%_discnumber%@CBRACKET@),$noop(
+    )$set(_nameForDiscFolder,@OSLASH@@OBRACKET@%_nameForTypeCD%%_discnumber%@CBRACKET@))$noop(
     )$if($and(%_discsubtitleForFilename%,$eq(%_showDiscSubtitle%,1)),$set(_nameForDiscFolder,%_nameForDiscFolder%~%_discsubtitleForFilename%))$noop(
     )$if($eq(%_useSubDiscFolder%,1),$noop(
       )$set(_nameForDiscFolder,$replace(%_nameForDiscFolder%,@OSLASH@@OBRACKET@,/))$noop(
