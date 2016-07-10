@@ -1,5 +1,5 @@
 $noop(★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★)
-$noop(★ MBP Magic-Script - v0.2                                              ★)
+$noop(★ MBP Magic-Script - v0.3.1                                            ★)
 $noop(★                                                                      ★)
 $noop(★ Here is a script for music renaming in MusicBrainz Picard            ★)
 $noop(★                                                                      ★)
@@ -57,6 +57,7 @@ $set(_orderType,1)
 
 $noop(★ CUSTOM SUBFOLDER BY TYPE ★)
 $set(_albumSubFolder,Albums/)
+$set(_liveSubFolder,Lives/)
 $set(_singlesSubFolder,Singles/)
 $set(_epSubFolder,EP/)
 $set(_broadcastSubFolder,Broadcast/)
@@ -117,6 +118,11 @@ $noop(########## DETECT MUSIC TYPE ###############################)
 $noop(★ Detect Album ★)
 $if($in(%releasetype%,album),
   $set(_isAlbum,1)
+)
+
+$noop(★ Detect Live ★)
+$if($in(%releasetype%,live),
+  $set(_isLive,1)
 )
 
 $noop(★ Detect Single ★)
@@ -265,11 +271,19 @@ $if(%_isSoundTrack%,%_soundTracksFolder%,
     $noop(★ Organize by type ★)
     $if($eq(%_separateByTypeInArtistFolder%,1),
       $if($or(%_isArtistCompil%,%_isGlobalCompil%),%_compilationsSubFolder%,
-        $if($and(%_isAlbum%,$eq(%_separateAlbum%,1)),%_albumSubFolder%)
-        $if(%_isSingle%,%_singlesSubFolder%)
-        $if(%_isEP%,%_epSubFolder%)
-        $if(%_isBroadcast%,%_broadcastSubFolder%)
-        $if(%_isOther%,%_otherSubFolder%)
+        $if($eq(%_isLive%,1),%_liveSubFolder%,
+          $if($eq(%_isSingle%,1),%_singlesSubFolder%,
+            $if($eq(%_isSingle%,1),%_epSubFolder%,
+              $if($eq(%_isBroadcast%,1),%_broadcastSubFolder%,
+                $if($eq(%_isOther%,1),%_otherSubFolder%,
+                  $if($eq(%_isAlbum%,1),
+                    $if($eq(%_separateAlbum%,1),%_albumSubFolder%)
+                  )
+                )
+              )
+            )
+          )
+        )
       )
     )
   )
